@@ -1,0 +1,28 @@
+# Device Aliases
+alias TempSens d0
+alias WallCooler d3
+
+# Variables
+alias curTemp r0
+
+# Set the temperature limits
+define minTemp 22
+define maxTemp 27
+
+# Run cycle
+Cycle:
+yield
+l curTemp TempSens Temperature
+sub curTemp curTemp 273.15
+
+bgt curTemp maxTemp StartCool
+blt curTemp minTemp StopCool
+j Cycle
+
+StartCool:
+s WallCooler On 1
+j Cycle
+
+StopCool:
+s WallCooler On 0
+j Cycle
