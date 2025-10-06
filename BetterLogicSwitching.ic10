@@ -1,0 +1,38 @@
+alias switch d3
+alias cctv d4
+
+define lcds HASH("ModularDeviceLEDdisplay3")
+define lcd HASH("LED_MINER")
+
+sbn lcds lcd Mode 10
+sbn lcds lcd On 1
+s db Setting 1767199946
+
+start:
+yield
+j onOff
+j start
+
+hashReadWrite:
+move r1 STR(" ")
+sbn lcds lcd Setting r1
+lbn r0 HASH("ModularDeviceFlipSwitch") HASH("switch_miner") On 0
+j startMiner
+j start
+
+startMiner:
+sbn HASH("StructureAutoMinerSmall") HASH("Autominer1") On r0
+beq r0 1 on
+beq r0 0 off
+on:
+sbn lcds lcd Setting STR("On")
+j start
+off:
+sbn lcds lcd Setting STR("Off")
+j start
+
+onOff:
+lbn r0 HASH("ModularDeviceFlipSwitch") HASH("switch_cctv") On 0
+s cctv On r0
+sbn HASH("StructureConsoleMonitor") HASH("console_cctv") On r0
+j hashReadWrite
