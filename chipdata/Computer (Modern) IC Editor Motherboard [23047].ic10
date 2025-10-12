@@ -1,0 +1,29 @@
+# Device Aliases
+alias TempSens d0
+alias CoolerSwitch d3
+
+# Variables
+alias curTemp r0
+alias curP r1
+
+# Set the temperature limits
+define minTemp 28
+define maxTemp 30
+
+# Run cycle
+Cycle:
+yield
+l curTemp TempSens Temperature
+sub curTemp curTemp 273.15
+
+bgt curTemp maxTemp CoolOn
+blt curTemp minTemp CoolOff
+j Cycle
+
+CoolOn:
+s CoolerSwitch On 1
+j Cycle
+
+CoolOff:
+s CoolerSwitch On 0
+j Cycle

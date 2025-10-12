@@ -1,0 +1,97 @@
+# SolarTrackerStack
+# two-axis solar trackers for all solar panels with maintance mode switch
+# Steam Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=3278608174
+# yt: https://youtu.be/xH1fYHyXwQI
+
+define day 1076425094 # daylight sensor
+define lever 1220484876
+define switch 321604921
+
+alias destHorizontal r0
+alias destVertical r1
+alias DaylightSensorHorizontal  r4
+alias tempStatus r5
+alias name r10
+alias index r11
+
+push -934345724 #heavy solar panel
+push -1545574413 #heavy solar panel dual
+push -2045627372 #solar panel
+push -539224550 #solar panel dual
+
+main:
+  yield
+
+  # maintace switch
+  lb r12 lever Open 0
+  brgez r12 2
+  snanz r12 r12
+  lb r13 switch Open 0
+  brgez r13 2
+  snanz r13 r13
+  or r12 r12 r13
+  beq r12 1 maintanceModeOn
+
+  # solar sensor data
+  lb r0 day Horizontal 0
+  brgez r0 2
+  j sensorError
+  lb r1 day Vertical 0
+  sub r1 90 r1
+  s db Setting 0
+
+rotatePanels:
+  move index 0
+xloop:
+  get name db index
+  sb name Horizontal r0
+  sb name Vertical r1
+  add index index 1
+  blt index sp xloop
+  j main
+
+maintanceModeOn:
+  move r0 45
+  move r1 0
+  j rotatePanels
+
+sensorError:
+  l r5 db Setting
+  brgtz r5 5
+  move r0 30
+  move r1 90
+  s db Setting 1
+  j rotatePanels
+
+  move index 0
+sensorErrorLoop:
+  get name db index
+  lb r4 name Horizontal 0
+  brgt r4 -181 3
+  add index index 1
+  blt index sp sensorErrorLoop
+
+  breq 30 r4 2
+  j sensorErrorNext
+  move r0 60
+  j rotatePanels
+sensorErrorNext:
+  breq 60 r4 2
+  j main
+  move r0 30
+  j rotatePanels
+
+#             --------
+#            | solar  |
+#            | sensor |
+#             ---d---
+#  --------      |       --------
+# | solar  p-----+------d    ic  p
+# | panel  d     |       --------
+#  --------      |
+#                |
+#  --------      |
+# |  solar  |    |      ----------
+# d  panel  p----+-----| lever or |
+# |  dual   |          |  switch  |
+#  --------             ----------
