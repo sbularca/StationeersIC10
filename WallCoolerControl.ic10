@@ -1,28 +1,28 @@
-# Device Aliases
-alias TempSens d0
-alias WallCooler d3
+define Coolers -739292323
+define Sensors -1252983604
+define SensorTemp HASH("SensorTemp")
 
-# Variables
-alias curTemp r0
+define idealTemp 25
+define delta 3
+move r5 0
 
-# Set the temperature limits
-define minTemp 22
-define maxTemp 27
-
-# Run cycle
 Cycle:
 yield
-l curTemp TempSens Temperature
-sub curTemp curTemp 273.15
+lbn r0 Sensors SensorTemp Temperature Average
+sub r0 r0 273.15
 
-bgt curTemp maxTemp StartCool
-blt curTemp minTemp StopCool
+sub r1 idealTemp delta 
+add r2 idealTemp delta  
+
+bltal r0 r1 ON
+bgtal r0 r2 OFF  
+
 j Cycle
 
-StartCool:
-s WallCooler On 1
-j Cycle
+ON:
+sb Coolers On 1
+j ra
 
-StopCool:
-s WallCooler On 0
-j Cycle
+OFF:
+sb Coolers On 0
+j ra

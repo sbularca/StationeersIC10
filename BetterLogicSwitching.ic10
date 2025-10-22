@@ -4,6 +4,9 @@ alias cctv d4
 define lcds HASH("ModularDeviceLEDdisplay3")
 define lcd HASH("LED_MINER")
 
+define AutoMiners HASH("StructureAutoMinerSmall")
+define miner1 HASH("Autominer1")
+
 sbn lcds lcd Mode 10
 sbn lcds lcd On 1
 s db Setting 1767199946
@@ -16,12 +19,12 @@ j start
 hashReadWrite:
 move r1 STR(" ")
 sbn lcds lcd Setting r1
-lbn r0 HASH("ModularDeviceFlipSwitch") HASH("switch_miner") On 0
+lbn r0 AutoMiners miner1 On Average
 j startMiner
 j start
 
 startMiner:
-sbn HASH("StructureAutoMinerSmall") HASH("Autominer1") On r0
+sbn AutoMiners miner1 On r0
 beq r0 1 on
 beq r0 0 off
 on:
