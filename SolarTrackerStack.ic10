@@ -42,8 +42,8 @@ main:
 
 rotatePanels:
   move index 0
+
 xloop:
-  get name db index
   sb name Horizontal r0
   sb name Vertical r1
   add index index 1
@@ -62,19 +62,19 @@ sensorError:
   move r1 90
   s db Setting 1
   j rotatePanels
-
   move index 0
+
 sensorErrorLoop:
   get name db index
   lb r4 name Horizontal Average
   brgt r4 -181 3
   add index index 1
   blt index sp sensorErrorLoop
-
   breq 30 r4 2
   j sensorErrorNext
   move r0 60
   j rotatePanels
+
 sensorErrorNext:
   breq 60 r4 2
   j main

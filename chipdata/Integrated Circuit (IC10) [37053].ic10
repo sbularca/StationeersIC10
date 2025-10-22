@@ -39,39 +39,39 @@ jal TankCycle
 j Cycle
 
 TankCycle:
-lbn r0 GasTanks TankO2 Pressure 0
-div r0 r0 60795
-sbn ConsoleGauges gaugeO2 Setting r0
-lbn r0 GasTanks TankVolatiles Pressure 0
-div r0 r0 60795
-sbn ConsoleGauges gaugeV Setting r0
-lbn r0 GasTanks TankCO2 Pressure 0
-div r0 r0 60795
-sbn ConsoleGauges gaugeCO2 Setting r0
-lbn r0 GasTanks TankNitro Pressure 0
-div r0 r0 60795
-sbn ConsoleGauges gaugeNitro Setting r0
-lbn r0 GasTanks TankNO2 Pressure 0
-div r0 r0 60795
-sbn ConsoleGauges gaugeNO2 Setting r0
+    lbn r0 GasTanks TankO2 Pressure Average
+    div r0 r0 60795
+    sbn ConsoleGauges gaugeO2 Setting r0
+    lbn r0 GasTanks TankVolatiles Pressure Average
+    div r0 r0 60795
+    sbn ConsoleGauges gaugeV Setting r0
+    lbn r0 GasTanks TankCO2 Pressure Average
+    div r0 r0 60795
+    sbn ConsoleGauges gaugeCO2 Setting r0
+    lbn r0 GasTanks TankNitro Pressure Average
+    div r0 r0 60795
+    sbn ConsoleGauges gaugeNitro Setting r0
+    lbn r0 GasTanks TankNO2 Pressure Average
+    div r0 r0 60795
+    sbn ConsoleGauges gaugeNO2 Setting r0
 j ra
 
 FliterCycle:
-lbn r0 ConsoleSwitches switchCO2 On 0
-sbn Filtrations filtrationCO2 On r0
-yield
-lbn r0 Filtrations filtrationCO2 On 0
-sbn ConsoleDiodes diodeCO2 On r0
+    lbn r0 ConsoleSwitches switchCO2 On Average
+    sbn Filtrations filtrationCO2 On r0
+    yield
+    lbn r0 Filtrations filtrationCO2 On Average
+    sbn ConsoleDiodes diodeCO2 On r0
 
-lbn r0 ConsoleSwitches switchNitro On 0
-sbn Filtrations filtrationNitro On r0
-yield
-lbn r0 Filtrations filtrationNitro On 0
-sbn ConsoleDiodes diodeNitro On r0
+    lbn r0 ConsoleSwitches switchNitro On Average
+    sbn Filtrations filtrationNitro On r0
+    yield
+    lbn r0 Filtrations filtrationNitro On Average
+    sbn ConsoleDiodes diodeNitro On r0
 
-lbn r0 ConsoleSwitches mixerSwitch On 0
-s FuelMixer On r0
-yield
-l r0 FuelMixer On
-sbn ConsoleDiodes mixerDiode On r0
+    lbn r0 ConsoleSwitches mixerSwitch On Average
+    s FuelMixer On r0
+    yield
+    l r0 FuelMixer On
+    sbn ConsoleDiodes mixerDiode On r0
 j ra

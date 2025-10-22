@@ -7,22 +7,22 @@ define delta 3
 move r5 0
 
 Cycle:
-yield
-lbn r0 Sensors SensorTemp Temperature Average
-sub r0 r0 273.15
+	yield
+	lbn r0 Sensors SensorTemp Temperature Average
+	sub r0 r0 273.15
 
-sub r1 idealTemp delta 
-add r2 idealTemp delta  
+	sub r1 idealTemp delta
+	add r2 idealTemp delta
 
-bltal r0 r1 ON
-bgtal r0 r2 OFF  
-
+	bltal r0 r1 ON
+	bgtal r0 r2 OFF
+		
 j Cycle
 
 ON:
-sb Coolers On 1
+	sb Coolers On 1
 j ra
 
 OFF:
-sb Coolers On 0
+	sb Coolers On 0
 j ra

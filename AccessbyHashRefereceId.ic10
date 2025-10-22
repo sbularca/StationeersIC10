@@ -10,14 +10,14 @@ sbn LogicButtons testButton1 Color 1
 move r1 0
 
 start:
-lbn r0 LogicButtons testButton1 On 0
-seq r1 r0 1
-beq r1 0 skip
-sbn LogicButtons testButton1 Color 5
-# add r2 r2 1
-lbn r2 Battery lb PowerActual 0
-sbn LedDisplay ledDisplay1 Setting r2
-sleep 1
+	lbn r0 LogicButtons testButton1 On Average
+	seq r1 r0 1
+	beq r1 0 skip
+	sbn LogicButtons testButton1 Color 5
+	# add r2 r2 1
+	lbn r2 Battery lb PowerActual Average
+	sbn LedDisplay ledDisplay1 Setting r2
+	sleep 1
 j start
 
 skip:

@@ -12,12 +12,12 @@ define maxTemp 30
 
 # Run cycle
 Cycle:
-yield
-l curTemp TempSens Temperature
-sub curTemp curTemp 273.15
-
-bgt curTemp maxTemp CoolOn
-blt curTemp minTemp CoolOff
+	yield
+	l curTemp TempSens Temperature
+	sub curTemp curTemp 273.15
+	
+	bgt curTemp maxTemp CoolOn
+	blt curTemp minTemp CoolOff
 j Cycle
 
 CoolOn:
