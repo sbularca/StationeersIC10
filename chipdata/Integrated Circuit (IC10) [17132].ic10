@@ -1,0 +1,77 @@
+alias dial d0
+alias base db
+alias selection r0
+start:
+l selection dial Setting
+beq selection 0 off
+beq selection 1 silicon
+beq selection 2 iron
+beq selection 3 gold
+beq selection 4 copper
+beq selection 5 silver
+beq selection 6 lead
+beq selection 7 nickel
+beq selection 8 steel
+beq selection 9 constantan
+beq selection 10 astroloy
+beq selection 11 inconel
+beq selection 12 electrum
+beq selection 13 stellite
+beq selection 14 solder
+beq selection 15 waspaloy
+beq selection 16 invar
+bge selection 17 hastelloy
+off: #0
+s base Setting 0
+j start
+silicon: #1
+s base Setting -290196476
+j start
+iron:#2
+s base Setting -1301215609
+j start
+gold: #3
+s base Setting 226410516
+j start
+copper: #4
+s base Setting -404336834
+j start
+silver: #5
+s base Setting -929742000
+j start
+lead: #6
+s base Setting 2134647745
+j start
+nickel: #7
+s base Setting -1406385572
+j start
+steel: #8
+s base Setting -654790771
+j start
+constantan: #9
+s base Setting 1058547521
+j start
+astroloy: #10
+s base Setting 412924554
+j start
+inconel: #11
+s base Setting -787796599
+j start
+electrum: #12
+s base Setting 502280180
+j start
+stellite: #13
+s base Setting -1897868623
+j start
+solder: #14
+s base Setting -82508479
+j start
+waspaloy: #15
+s base Setting 156348098
+j start
+invar: #16
+s base Setting -297990285
+j start
+hastelloy: #17
+s base Setting 1579842814
+j start

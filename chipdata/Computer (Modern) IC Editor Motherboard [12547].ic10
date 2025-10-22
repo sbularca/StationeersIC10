@@ -1,0 +1,77 @@
+define ConsoleSwitches 1773255945
+define ConsoleDiodes 1311586884
+define ConsoleGauges -1013553731
+define Filtrations -348054045
+define GasTanks 272136332
+
+define switchCO2 HASH("CO2FilterFlipSwitch")
+define diodeCO2 HASH("CO2Diode")
+define switchNitro HASH("NitroFlipSwitch")
+define diodeNitro HASH("NitroDiode")
+define mixerSwitch HASH("FuelMixerFlipSwitch")
+define mixerDiode HASH("MixerDiode")
+
+define gaugeO2 HASH("O2")
+define gaugeV HASH("Volatiles")
+define gaugeCO2 HASH("CO2")
+define gaugeNitro HASH("Nitrogen")
+define gaugeNO2 HASH("NO2")
+
+define filtrationCO2 HASH("CO2Filtration")
+define filtrationNitro HASH("NitroFiltration")
+
+define TankO2 HASH("Oxygen Tank")
+define TankCO2 HASH("CO2Tank")
+define TankNitro HASH("NitrogenTank")
+define TankNO2 HASH("NitrogenOxideTank")
+define TankVolatiles HASH("Volatiles Tank")
+
+alias FuelMixer d0
+
+sbn ConsoleDiodes diodeCO2 Color 5
+sbn ConsoleDiodes diodeNitro Color 0
+sbn ConsoleDiodes mixerDiode Color 4
+
+Cycle:
+yield
+jal FliterCycle
+jal TankCycle
+j Cycle
+
+TankCycle:
+lbn r0 GasTanks TankO2 Pressure 0
+div r0 r0 60795
+sbn ConsoleGauges gaugeO2 Setting r0
+lbn r0 GasTanks TankVolatiles Pressure 0
+div r0 r0 60795
+sbn ConsoleGauges gaugeV Setting r0
+lbn r0 GasTanks TankCO2 Pressure 0
+div r0 r0 60795
+sbn ConsoleGauges gaugeCO2 Setting r0
+lbn r0 GasTanks TankNitro Pressure 0
+div r0 r0 60795
+sbn ConsoleGauges gaugeNitro Setting r0
+lbn r0 GasTanks TankNO2 Pressure 0
+div r0 r0 60795
+sbn ConsoleGauges gaugeNO2 Setting r0
+j ra
+
+FliterCycle:
+lbn r0 ConsoleSwitches switchCO2 On 0
+sbn Filtrations filtrationCO2 On r0
+yield
+lbn r0 Filtrations filtrationCO2 On 0
+sbn ConsoleDiodes diodeCO2 On r0
+
+lbn r0 ConsoleSwitches switchNitro On 0
+sbn Filtrations filtrationNitro On r0
+yield
+lbn r0 Filtrations filtrationNitro On 0
+sbn ConsoleDiodes diodeNitro On r0
+
+lbn r0 ConsoleSwitches mixerSwitch On 0
+s FuelMixer On r0
+yield
+l r0 FuelMixer On
+sbn ConsoleDiodes mixerDiode On r0
+j ra

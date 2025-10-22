@@ -1,0 +1,27 @@
+define ConsoleSwitches 1773255945
+define ConsoleDiodes 1311586884
+define ConsoleGauges -1013553731
+define Filtrations -348054045
+define GasTanks 272136332
+
+define switchCO2 HASH("CO2FlipSwitch")
+define diodeCO2 HASH("CO2Diode")
+define switchNitro HASH("NitroFlipSwitch")
+define diodeNitro HASH("NitroDiode")
+define mixerSwitch HASH("FuelMixerFlipSwitch")
+define mixerDiode HASH("MixerDiode")
+
+define gaugeO2 HASH("O2")
+define gaugeV HASH("Volatiles")
+define gaugeCO2 HASH("CO2")
+define gaugeNitro HASH("Nitrogen")
+define gaugeNO2 HASH("NO2")
+
+define filtrationCO2 HASH("CO2Filtration")
+define filtrationNitro HASH("NitroFiltration")
+
+define TankCO2 HASH("CO2Tank")
+define TankNitro HASH("NitroTank")
+define TankNO2 HASH("NO2Tank")
+define TankO2 HASH("O2Tank")
+defins TankVolatiles HASH("VolatilesTank")
