@@ -87,27 +87,27 @@ j ra
 TankCycle:
 move r12 ra
 lbn r0 InsulatedGasTanks TankO2 Pressure Average
-jal AdjustTemp
+jal CalcPressure
 sbn ConsoleGauges gaugeO2 Setting r0
 lbn r0 InsulatedGasTanks TankVolatiles Pressure Average
-jal AdjustTemp
+jal CalcPressure
 sbn ConsoleGauges gaugeV Setting r0
 lbn r0 GasTanks TankCO2 Pressure Average
-jal AdjustTemp
+jal CalcPressure
 sbn ConsoleGauges gaugeCO2 Setting r0
 lbn r0 InsulatedGasTanks TankNitro Pressure Average
-jal AdjustTemp
+jal CalcPressure
 sbn ConsoleGauges gaugeNitro Setting r0
 lbn r0 InsulatedGasTanks TankNO2 Pressure Average
-jal AdjustTemp
+jal CalcPressure
 sbn ConsoleGauges gaugeNO2 Setting r0
 lbn r0 InsulatedGasTanks TankFuel Pressure Average
-jal AdjustTemp
+jal CalcPressure
 sbn ConsoleGauges gaugeFuel Setting r0
 move ra r12
 j ra
 
-AdjustTemp:
+CalcPressure:
 div r0 r0 60795
 j ra
 
@@ -132,22 +132,28 @@ sbn ConsoleDiodes O2Diode On r0
 j ra
 
 DisplaysCycle:
+move r12 ra
 lbn r0 InsulatedGasTanks TankO2 Temperature Average
-sub r0 r0 273
+jal KelvinToCelsius
 sbn LedDisplays Disp02 Setting r0
 lbn r0 InsulatedGasTanks TankVolatiles Temperature Average
-sub r0 r0 273
+jal KelvinToCelsius
 sbn LedDisplays DispVolatiles Setting r0
 lbn r0 GasTanks TankCO2 Temperature Average
-sub r0 r0 273
+jal KelvinToCelsius
 sbn LedDisplays DispCO2 Setting r0
 lbn r0 InsulatedGasTanks TankNitro Temperature Average
-sub r0 r0 273
+jal KelvinToCelsius
 sbn LedDisplays DispNitro Setting r0
 lbn r0 InsulatedGasTanks TankNO2 Temperature Average
-sub r0 r0 273
+jal KelvinToCelsius
 sbn LedDisplays DispNO2 Setting r0
 lbn r0 InsulatedGasTanks TankFuel Temperature Average
-sub r0 r0 273
+jal KelvinToCelsius
 sbn LedDisplays DispFuel Setting r0
+move ra r12
+j ra
+
+KelvinToCelsius:
+sub r0 r0 273
 j ra
