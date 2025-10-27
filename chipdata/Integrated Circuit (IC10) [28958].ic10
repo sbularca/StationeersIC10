@@ -14,126 +14,148 @@ alias selection r6
 alias leverpull r7
 alias oxygenlevel r8
 
+define Displays -246585138
+define PressureDisplay HASH("Target Pressure")
+define TempDisplay HASH("Target Temperature")
+define CurrentPressureDisplay HASH("Current Pressure")
+define CurrentTempDisplay HASH("Current Temperature")
+
+sbn Displays PressureDisplay Mode 14
+sbn Displays TempDisplay Mode 11
+sbn Displays CurrentPressureDisplay Mode 14
+sbn Displays CurrentTempDisplay Mode 11
+
 initialize:
-    s fuelpump On 0
-    s coolantpump On 0
-    s fuelpump Setting 50 #Fuel Setting
-    s coolantpump Setting 30 #Coolant Setting
-    s furnace Lock 1 #Furnace Locked for Safety!!!
-    s furnace On 0
-    s furnace SettingOutput 100
+s fuelpump On 0
+s coolantpump On 0
+s fuelpump Setting 50 #Fuel Setting
+s coolantpump Setting 30 #Coolant Setting
+s furnace Lock 1 #Furnace Locked for Safety!!!
+s furnace On 0
+s furnace SettingOutput 100
 
 start:
-    s furnace SettingInput 100
-    l furnPress furnace Pressure
-    l furnTemp furnace Temperature
-    bgt furnPress 60000 fastvent
-    bgt furnPress 57000 vent
-    l selection dial Setting
-    l leverpull lever Setting
-    beq selection 0 shutdown
-    beq leverpull 0 process
-    beq leverpull 1 choice
+s furnace SettingInput 100
+l furnPress furnace Pressure
+l furnTemp furnace Temperature
+bgt furnPress 60000 fastvent
+bgt furnPress 57000 vent
+l selection dial Setting
+l leverpull lever Setting
+beq selection 0 shutdown
+beq leverpull 0 process
+beq leverpull 1 selected
 
 shutdown:
-    s fuelpump On 0
-    s coolantpump On 0
-    s furnace SettingOutput 100
-    beq leverpull 1 clear
-    bgt furnPress 35000 start
-    s furnace Open 0
-    s furnace On 0
+s fuelpump On 0
+s coolantpump On 0
+s furnace SettingOutput 100
+beq leverpull 1 clear
+bgt furnPress 35000 start
+s furnace Open 0
+s furnace On 0
 j start
 
 process:
-    s furnace On 1
-    s furnace Open 0
-    s coolantpump On 0
-    bgt furnPress 35000 vent
-    s furnace SettingOutput 0
-    blt furnTemp 1000 warmup
-    s fuelpump On 0
+s furnace On 1
+s furnace Open 0
+s coolantpump On 0
+bgt furnPress 35000 vent
+s furnace SettingOutput 0
+blt furnTemp 1000 warmup
+s fuelpump On 0
 j start
 
-choice:
-    move pressmin 1000
-    move pressmax 40000
-    move tempmin 1000
-    move tempmax 10000
-    ble selection 8 smelt #^^Basic Ores^^
-    move pressmin 20000
-    beq selection 9 smelt #^^Constantan^^
-    move pressmin 30000
-    beq selection 10 smelt #^^Astroloy^^
-    move pressmin 23500
-    move pressmax 24000
-    beq selection 11 smelt #^^Inconel^^
-    move pressmin 800
-    move pressmax 2400
-    beq selection 12 smelt #^^Electrum^^
-    move pressmin 10000
-    move pressmax 20000
-    move tempmin 1800
-    beq selection 13 smelt #^^Stellite^^
-    move pressmin 1000
-    move tempmin 350
-    move tempmax 550
-    beq selection 14 smelt #^^Solder^^
-    move pressmin 50000
-    move pressmax 55000
-    move tempmin 400
-    move tempmax 800
-    beq selection 15 smelt #^^Waspaloy^^
-    move pressmin 18000
-    move pressmax 20000
-    move tempmin 1200
-    move tempmax 1500
-    beq selection 16 smelt #^^Invar^^
-    move pressmin 25000
-    move pressmax 30000
-    move tempmin 950
-    move tempmax 1000 #^^Hastelloy^^
+selected:
+move pressmin 1000
+move pressmax 40000
+move tempmin 1000
+move tempmax 10000
+ble selection 8 smelt #^^Basic Ores^^
+move pressmin 20000
+beq selection 9 smelt #^^Constantan^^
+move pressmin 30000
+beq selection 10 smelt #^^Astroloy^^
+move pressmin 23500
+move pressmax 24000
+beq selection 11 smelt #^^Inconel^^
+move pressmin 800
+move pressmax 2400
+beq selection 12 smelt #^^Electrum^^
+move pressmin 10000
+move pressmax 20000
+move tempmin 1800
+beq selection 13 smelt #^^Stellite^^
+move pressmin 1000
+move tempmin 350
+move tempmax 550
+beq selection 14 smelt #^^Solder^^
+move pressmin 50000
+move pressmax 55000
+move tempmin 400
+move tempmax 800
+beq selection 15 smelt #^^Waspaloy^^
+move pressmin 18000
+move pressmax 20000
+move tempmin 1200
+move tempmax 1500
+beq selection 16 smelt #^^Invar^^
+move pressmin 25000
+move pressmax 30000
+move tempmin 950
+move tempmax 1000
+beq selection 17 smelt #^^Hastelloy^^
 
 smelt:
-    s furnace On 1
-    ble furnTemp tempmin warmup
-    ble furnPress pressmin warmup
-    s fuelpump On 0
-    bge furnPress pressmax slowvent
-    s furnace SettingOutput 0
-    bge furnTemp tempmax cooldown
-    s coolantpump On 0
-    sleep 1
-    s furnace Open 1
-    sleep 1
-    s furnace Open 0
+sbn Displays TempDisplay Setting tempmin
+sbn Displays PressureDisplay Setting pressmin
+sbn Displays CurrentTempDisplay Setting furnTemp
+sbn Displays CurrentPressureDisplay Setting furnPress
+
+s furnace On 1
+ble furnTemp tempmin warmup
+ble furnPress pressmin warmup
+s fuelpump On 0
+bge furnPress pressmax slowvent
+s furnace SettingOutput 0
+bge furnTemp tempmax cooldown
+s coolantpump On 0
+sleep 1
+s furnace Open 1
+sleep 1
+s furnace Open 0
 j start
 
 warmup:
-    s furnace SettingOutput 0
-    s fuelpump On 1
-    s furnace Activate 1
+sbn Displays TempDisplay Setting tempmin
+sbn Displays PressureDisplay Setting pressmin
+sbn Displays CurrentTempDisplay Setting furnTemp
+sbn Displays CurrentPressureDisplay Setting furnPress
+
+s furnace SettingOutput 0
+s fuelpump On 1
+s furnace Activate 1
 j start
 
 slowvent:
-    s fuelpump On 0
-    s furnace SettingOutput 15
+s fuelpump On 0
+s furnace SettingOutput 15
 j start
 
 vent:
-    s furnace SettingOutput 30
+s furnace SettingOutput 30
 j start
 
 fastvent:
-    s furnace SettingOutput 100
+s furnace SettingOutput 100
 j start
 
 cooldown:
-    s coolantpump On 1
+s coolantpump On 1
 j start
 
 clear:
-    s furnace On 1
-    s furnace Open 1
-    s furnace SettingOutput 100
+s furnace On 1
+s furnace Open 1
+s furnace SettingOutput 100
 j start

@@ -1,0 +1,55 @@
+alias posX r2
+alias posY r3
+alias posZ r4
+alias robot db
+alias mode r0
+s robot Mode 0
+
+Initialize:
+s robot Mode 3
+
+Roaming:
+yield
+l mode robot Mode
+beqz mode Initialize
+beq mode 6 Return
+j Roaming
+
+Return:
+l posX robot PositionX
+l posY robot PositionY
+l posZ robot PositionZ
+s robot TargetX 11
+s robot TargetY 0
+s robot TargetZ 2
+s robot Mode 2
+yield
+yield
+yield
+
+Returning:
+yield
+l mode robot Mode
+beqz mode Returned
+j Returning
+
+Returned:
+s robot Mode 4
+
+Unloading:
+yield
+l mode robot Mode
+beqz mode Leave
+j Unloading
+
+Leave:
+s robot TargetX posX
+s robot TargetY posY
+s robot TargetZ posZ
+s robot Mode 5
+
+Leaving:
+yield
+l mode robot Mode
+beqz mode Initialize
+j Leaving

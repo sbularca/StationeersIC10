@@ -2,7 +2,12 @@ define ConsoleSwitches 1773255945
 define ConsoleDiodes 1311586884
 define ConsoleGauges -1013553731
 define Filtrations -348054045
-define GasTanks 272136332
+define InsulatedGasTanks 272136332
+define GasTanks 1013514688
+define GasMixers 2104106366
+define LedDisplays -2041948072
+define CoverSwitches -236516384
+define Dials -1158984141
 
 define switchCO2 HASH("CO2FilterFlipSwitch")
 define diodeCO2 HASH("CO2Diode")
@@ -10,23 +15,44 @@ define switchNitro HASH("NitroFlipSwitch")
 define diodeNitro HASH("NitroDiode")
 define mixerSwitch HASH("FuelMixerFlipSwitch")
 define mixerDiode HASH("MixerDiode")
+define switch02 HASH("O2FlipSwitch")
+define O2Diode HASH("O2Diode")
+define DialAlloy HASH("DialAlloy")
+
+define ToggleSwitch HASH("Toggle Furnace")
 
 define gaugeO2 HASH("O2")
 define gaugeV HASH("Volatiles")
 define gaugeCO2 HASH("CO2")
 define gaugeNitro HASH("Nitrogen")
 define gaugeNO2 HASH("NO2")
+define gaugeFuel HASH("Fuel")
 
 define filtrationCO2 HASH("CO2Filtration")
 define filtrationNitro HASH("NitroFiltration")
+define filtrationO2 HASH("Filter O2")
 
 define TankO2 HASH("Oxygen Tank")
 define TankCO2 HASH("CO2Tank")
 define TankNitro HASH("NitrogenTank")
 define TankNO2 HASH("NitrogenOxideTank")
 define TankVolatiles HASH("Volatiles Tank")
+define TankFuel HASH("Fuel Tank")
+define FuelMixer HASH("Fuel Mixer")
 
-alias FuelMixer d0
+define Disp02 HASH("TempO2")
+define DispCO2 HASH("TempCO2")
+define DispNitro HASH("TempN")
+define DispNO2 HASH("TempNO2")
+define DispVolatiles HASH("TempV")
+define DispFuel HASH("TempFuel")
+
+sbn LedDisplays DispNitro Mode 4
+sbn LedDisplays DispNO2 Mode 4
+sbn LedDisplays DispVolatiles Mode 4
+sbn LedDisplays DispCO2 Mode 4
+sbn LedDisplays Disp02 Mode 4
+sbn LedDisplays DispFuel Mode 4
 
 sbn ConsoleDiodes diodeCO2 Color 5
 sbn ConsoleDiodes diodeNitro Color 0
@@ -34,44 +60,94 @@ sbn ConsoleDiodes mixerDiode Color 4
 
 Cycle:
 yield
+jal HandleToggle
+jal DisplaysCycle
 jal FliterCycle
 jal TankCycle
 j Cycle
 
+HandleToggle:
+move r12 ra
+lbn r0 CoverSwitches ToggleSwitch On Average
+seq r1 r0 1
+lbn r2 Dials DialAlloy Setting Average
+beqal r1 0 ForceDialOff
+beqal r2 1 ForceDialOn
+move ra r12
+j ra
+
+ForceDialOff:
+sbn Dials DialAlloy Setting 0
+j ra
+
+ForceDialOn:
+sbn Dials DialAlloy Setting r2
+j ra
+
 TankCycle:
-    lbn r0 GasTanks TankO2 Pressure Average
-    div r0 r0 60795
-    sbn ConsoleGauges gaugeO2 Setting r0
-    lbn r0 GasTanks TankVolatiles Pressure Average
-    div r0 r0 60795
-    sbn ConsoleGauges gaugeV Setting r0
-    lbn r0 GasTanks TankCO2 Pressure Average
-    div r0 r0 60795
-    sbn ConsoleGauges gaugeCO2 Setting r0
-    lbn r0 GasTanks TankNitro Pressure Average
-    div r0 r0 60795
-    sbn ConsoleGauges gaugeNitro Setting r0
-    lbn r0 GasTanks TankNO2 Pressure Average
-    div r0 r0 60795
-    sbn ConsoleGauges gaugeNO2 Setting r0
+move r12 ra
+lbn r0 InsulatedGasTanks TankO2 Pressure Average
+jal AdjustTemp
+sbn ConsoleGauges gaugeO2 Setting r0
+lbn r0 InsulatedGasTanks TankVolatiles Pressure Average
+jal AdjustTemp
+sbn ConsoleGauges gaugeV Setting r0
+lbn r0 GasTanks TankCO2 Pressure Average
+jal AdjustTemp
+sbn ConsoleGauges gaugeCO2 Setting r0
+lbn r0 InsulatedGasTanks TankNitro Pressure Average
+jal AdjustTemp
+sbn ConsoleGauges gaugeNitro Setting r0
+lbn r0 InsulatedGasTanks TankNO2 Pressure Average
+jal AdjustTemp
+sbn ConsoleGauges gaugeNO2 Setting r0
+lbn r0 InsulatedGasTanks TankFuel Pressure Average
+jal AdjustTemp
+sbn ConsoleGauges gaugeFuel Setting r0
+move ra r12
+j ra
+
+AdjustTemp:
+div r0 r0 60795
 j ra
 
 FliterCycle:
-    lbn r0 ConsoleSwitches switchCO2 On Average
-    sbn Filtrations filtrationCO2 On r0
-    yield
-    lbn r0 Filtrations filtrationCO2 On Average
-    sbn ConsoleDiodes diodeCO2 On r0
+lbn r0 ConsoleSwitches switchCO2 On Average
+sbn Filtrations filtrationCO2 On r0
+lbn r0 ConsoleSwitches switchNitro On Average
+sbn Filtrations filtrationNitro On r0
+lbn r0 ConsoleSwitches mixerSwitch On Average
+sbn GasMixers FuelMixer On r0
+lbn r0 ConsoleSwitches switch02 On Average
+sbn Filtrations filtrationO2 On r0
+yield
+lbn r0 Filtrations filtrationCO2 On Average
+sbn ConsoleDiodes diodeCO2 On r0
+lbn r0 Filtrations filtrationNitro On Average
+sbn ConsoleDiodes diodeNitro On r0
+lbn r0 GasMixers FuelMixer On Average
+sbn ConsoleDiodes mixerDiode On r0
+lbn r0 Filtrations filtrationO2 On Average
+sbn ConsoleDiodes O2Diode On r0
+j ra
 
-    lbn r0 ConsoleSwitches switchNitro On Average
-    sbn Filtrations filtrationNitro On r0
-    yield
-    lbn r0 Filtrations filtrationNitro On Average
-    sbn ConsoleDiodes diodeNitro On r0
-
-    lbn r0 ConsoleSwitches mixerSwitch On Average
-    s FuelMixer On r0
-    yield
-    l r0 FuelMixer On
-    sbn ConsoleDiodes mixerDiode On r0
+DisplaysCycle:
+lbn r0 InsulatedGasTanks TankO2 Temperature Average
+sub r0 r0 273
+sbn LedDisplays Disp02 Setting r0
+lbn r0 InsulatedGasTanks TankVolatiles Temperature Average
+sub r0 r0 273
+sbn LedDisplays DispVolatiles Setting r0
+lbn r0 GasTanks TankCO2 Temperature Average
+sub r0 r0 273
+sbn LedDisplays DispCO2 Setting r0
+lbn r0 InsulatedGasTanks TankNitro Temperature Average
+sub r0 r0 273
+sbn LedDisplays DispNitro Setting r0
+lbn r0 InsulatedGasTanks TankNO2 Temperature Average
+sub r0 r0 273
+sbn LedDisplays DispNO2 Setting r0
+lbn r0 InsulatedGasTanks TankFuel Temperature Average
+sub r0 r0 273
+sbn LedDisplays DispFuel Setting r0
 j ra

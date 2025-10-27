@@ -1,0 +1,27 @@
+define LogicButtons -1612655781 #butons hash
+define LedDisplay -246585138 #leds hash
+define testButton1 HASH("BUTTON_TEST")
+define ledDisplay1 HASH("LED_TEST")
+define Battery -1388288459
+define lb HASH("lb1")
+
+sbn LedDisplay ledDisplay1 Mode 0
+sbn LogicButtons testButton1 Color 1
+move r1 0
+
+start:
+lbn r0 LogicButtons testButton1 On Average
+seq r1 r0 1
+beq r1 0 skip
+sbn LogicButtons testButton1 Color 5
+# add r2 r2 1
+lbn r2 Battery lb PowerActual Average
+sbn LedDisplay ledDisplay1 Setting r2
+sleep 1
+j start
+
+skip:
+sbn LogicButtons testButton1 Color 1
+sbn LedDisplay ledDisplay1 Setting 0
+move r1 0
+j start

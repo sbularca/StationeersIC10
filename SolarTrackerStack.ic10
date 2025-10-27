@@ -66,7 +66,7 @@ sensorError:
 
 sensorErrorLoop:
   get name db index
-  lb r4 name Horizontal Average
+  lb r4 name Horizontal 0
   brgt r4 -181 3
   add index index 1
   blt index sp sensorErrorLoop
