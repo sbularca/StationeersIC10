@@ -20,7 +20,7 @@ j start
 hashReadWrite:
 	move r1 STR(" ")
 	sbn lcds lcd Setting r1
-	lbn r0 AutoMiners miner1 On 0
+	lbn r0 AutoMiners miner1 On Average
 	j startMiner
 	j start
 	
