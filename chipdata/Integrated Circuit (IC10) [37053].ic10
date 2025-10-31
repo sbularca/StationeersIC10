@@ -8,6 +8,10 @@ define GasMixers 2104106366
 define LedDisplays -2041948072
 define CoverSwitches -236516384
 define Dials -1158984141
+define Sensors -1252983604
+define LargeDisplays -246585138
+define LogicSwitches -1612655781
+define DigitalValves -1280984102
 
 define switchCO2 HASH("CO2FilterFlipSwitch")
 define diodeCO2 HASH("CO2Diode")
@@ -18,8 +22,11 @@ define mixerDiode HASH("MixerDiode")
 define switch02 HASH("O2FlipSwitch")
 define O2Diode HASH("O2Diode")
 define DialAlloy HASH("DialAlloy")
+define FurnaceRoomSens HASH("FurnaceRoomSens")
 
 define ToggleSwitch HASH("Toggle Furnace")
+define FurnaceExoLogicSwitch HASH("FurnaceExoValveSwitch")
+define FurnaceExoValve HASH("FurnaceExoValve")
 
 define gaugeO2 HASH("O2")
 define gaugeV HASH("Volatiles")
@@ -46,6 +53,8 @@ define DispNitro HASH("TempN")
 define DispNO2 HASH("TempNO2")
 define DispVolatiles HASH("TempV")
 define DispFuel HASH("TempFuel")
+define DispFurnaceRoomTemp HASH("FurnaceRoomTemp")
+define DispFurnaceRoomPress HASH("FurnaceRoomPressure")
 
 sbn LedDisplays DispNitro Mode 4
 sbn LedDisplays DispNO2 Mode 4
@@ -53,10 +62,13 @@ sbn LedDisplays DispVolatiles Mode 4
 sbn LedDisplays DispCO2 Mode 4
 sbn LedDisplays Disp02 Mode 4
 sbn LedDisplays DispFuel Mode 4
+sbn LargeDisplays DispFurnaceRoomTemp Mode 4
+sbn LargeDisplays DispFurnaceRoomPress Mode 14
 
 sbn ConsoleDiodes diodeCO2 Color 5
 sbn ConsoleDiodes diodeNitro Color 0
 sbn ConsoleDiodes mixerDiode Color 4
+sbn ConsoleDiodes O2Diode Color 3
 
 Cycle:
 yield
@@ -87,31 +99,32 @@ j ra
 TankCycle:
 move r12 ra
 lbn r0 InsulatedGasTanks TankO2 Pressure Average
-jal AdjustTemp
+jal CalcPressure
 sbn ConsoleGauges gaugeO2 Setting r0
 lbn r0 InsulatedGasTanks TankVolatiles Pressure Average
-jal AdjustTemp
+jal CalcPressure
 sbn ConsoleGauges gaugeV Setting r0
 lbn r0 GasTanks TankCO2 Pressure Average
-jal AdjustTemp
+jal CalcPressure
 sbn ConsoleGauges gaugeCO2 Setting r0
 lbn r0 InsulatedGasTanks TankNitro Pressure Average
-jal AdjustTemp
+jal CalcPressure
 sbn ConsoleGauges gaugeNitro Setting r0
 lbn r0 InsulatedGasTanks TankNO2 Pressure Average
-jal AdjustTemp
+jal CalcPressure
 sbn ConsoleGauges gaugeNO2 Setting r0
 lbn r0 InsulatedGasTanks TankFuel Pressure Average
-jal AdjustTemp
+jal CalcPressure
 sbn ConsoleGauges gaugeFuel Setting r0
 move ra r12
 j ra
 
-AdjustTemp:
+CalcPressure:
 div r0 r0 60795
 j ra
 
 FliterCycle:
+move r12 ra
 lbn r0 ConsoleSwitches switchCO2 On Average
 sbn Filtrations filtrationCO2 On r0
 lbn r0 ConsoleSwitches switchNitro On Average
@@ -129,25 +142,48 @@ lbn r0 GasMixers FuelMixer On Average
 sbn ConsoleDiodes mixerDiode On r0
 lbn r0 Filtrations filtrationO2 On Average
 sbn ConsoleDiodes O2Diode On r0
+lbn r0 LogicSwitches FurnaceExoLogicSwitch On Average
+sbn DigitalValves FurnaceExoValve On r0
+jal SetColor
+move ra r12
+j ra
+
+SetColor:
+poke 1 5
+poke 2 1
+sub r0 2 r0
+get r1 db r0
+sbn LogicSwitches FurnaceExoLogicSwitch Color r1
 j ra
 
 DisplaysCycle:
+move r12 ra
 lbn r0 InsulatedGasTanks TankO2 Temperature Average
-sub r0 r0 273
+jal KelvinToCelsius
 sbn LedDisplays Disp02 Setting r0
 lbn r0 InsulatedGasTanks TankVolatiles Temperature Average
-sub r0 r0 273
+jal KelvinToCelsius
 sbn LedDisplays DispVolatiles Setting r0
 lbn r0 GasTanks TankCO2 Temperature Average
-sub r0 r0 273
+jal KelvinToCelsius
 sbn LedDisplays DispCO2 Setting r0
 lbn r0 InsulatedGasTanks TankNitro Temperature Average
-sub r0 r0 273
+jal KelvinToCelsius
 sbn LedDisplays DispNitro Setting r0
 lbn r0 InsulatedGasTanks TankNO2 Temperature Average
-sub r0 r0 273
+jal KelvinToCelsius
 sbn LedDisplays DispNO2 Setting r0
 lbn r0 InsulatedGasTanks TankFuel Temperature Average
-sub r0 r0 273
+jal KelvinToCelsius
 sbn LedDisplays DispFuel Setting r0
+lbn r0 Sensors FurnaceRoomSens Temperature Average
+jal KelvinToCelsius
+sbn LargeDisplays DispFurnaceRoomTemp Setting r0
+lbn r0 Sensors FurnaceRoomSens Pressure Average
+sbn LargeDisplays DispFurnaceRoomPress Setting r0
+move ra r12
+j ra
+
+KelvinToCelsius:
+sub r0 r0 273
 j ra

@@ -1,0 +1,57 @@
+define LightSensors 1076425094
+define GasSensors -1252983604
+
+define GrowLights -1758710260 
+define WallHeaters 24258244
+
+define Autolathes 336213101
+define HidraBenders -1888248335
+define ElPrinters 1307165496
+define Stackers 1585641623
+
+define lightSensor HASH("LightSensor")
+define temperatureSensor HASH("InteriorGasSensor")
+
+define atlStacker HASH("ATLStacker")
+define hpbStacker HASH("HPBStacker")
+define epStacker HASH("EPStacker")
+
+define minTemp 22
+define maxTemp 28
+
+main:
+yield
+jal loopGrowLights
+jal loopTemperatureControl
+jal StackerControl
+j main
+
+StackerControl:
+lb r0 Autolathes On Maximum
+sbn Stackers atlStacker On r0
+lb r0 HidraBenders On Maximum
+sbn Stackers hpbStacker On r0
+lb r0 ElPrinters On Maximum
+sbn Stackers epStacker On r0
+j ra
+
+loopGrowLights:
+lbn r0 LightSensors lightSensor Activate Average
+sb GrowLights On r0
+j ra
+
+loopTemperatureControl:
+move r12 ra
+lbn r0 GasSensors temperatureSensor Temperature Average
+select r1 r0 setHeatingOff setHeatingOn
+jal r1
+move ra r12
+j ra
+
+setHeatingOn:
+sb WallHeaters On 1
+j ra
+
+setHeatingOff:
+sb WallHeaters On 0
+j ra
