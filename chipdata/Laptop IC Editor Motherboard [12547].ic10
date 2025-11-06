@@ -1,61 +1,66 @@
-alias Suit db # hardsuit itself
-alias Helmet d0 # hardsuit helmet
+define FlipSwitches 1773255945
+define DialsLarge 1465300791
+define MediumSats 439026183
+define LandingDatas -2066405918
+define DispSmall -2041948072
+define ButtonsSquare 1462769197
 
-# setup register references
-alias TempExternal r0
-alias PressExternal r1
-alias SafetyCheck r2 # 1 = safe, 0 = unsafe
-alias HelmetOpen r3 # 1 = open, 0 = closed
+define LD1 HASH("LD1")
+define MediumSat1 HASH("MediumSatelliteDish1")
 
-# setup safety margins
-define SafeTempMax 302.15 # set in Kelvins, 302.15 K = 29 C
-define SafeTempMin 283.15 # 283.15 K = 10 C
-define SafePressureMax 175 # both in kPa
-define SafePressureMin 45
+define SwitchSat HASH("SwitchSat")
+define SwitchLandingPad HASH("SwitchLandingPad")
 
-start:
- yield
- # runs safety checks and decides which mode to activate
- jal atmocheck
- beqz SafetyCheck safe
- bnez SafetyCheck danger
-j start
+define DispSatPower HASH("DispSatPower")
+define DispSatHoriz HASH("DispSatHoriz")
+define DispSatVert HASH("DispSatVert")
 
-atmocheck:
- # first checks if pressure is safe
- move SafetyCheck 0
- l PressExternal Suit PressureExternal
- slt SafetyCheck PressExternal SafePressureMin
- bnez SafetyCheck ra
- sgt SafetyCheck PressExternal SafePressureMax
- bnez SafetyCheck ra
- # then checks if temp is safe
- l TempExternal Suit TemperatureExternal
- slt SafetyCheck TempExternal SafeTempMin
- bnez SafetyCheck ra
- sgt SafetyCheck TempExternal SafeTempMax
- bnez SafetyCheck ra
+define DialSatPower HASH("DialSatPower")
+define DialSatHoriz HASH("DialSatHorizontal")
+define DialSatVert HASH("DialSatVertical")
+define ButtonLandActivate HASH("ButtonLandActivate")
+
+sbn DispSmall DispSatPower Mode 2
+
+main:
+jal HandleAntenna
+jal HandleLandingPad
+jal HandleDials
+jal DisplayData
+j main
+
+DisplayData:
+lbn r0 MediumSats MediumSat1 RequiredPower Average
+sbn DispSmall DispSatPower Setting r0
+lbn r0 MediumSats MediumSat1 Horizontal Average
+sbn DispSmall DispSatHoriz Setting r0
+lbn r0 MediumSats MediumSat1 Vertical Average
+sbn DispSmall DispSatVert Setting r0
+
+HandleDials:
+#lbn r0 DialsLarge DialSatPower Setting Average
+#add r0 r0 1
+#mul r1 r0 500
+#sbn  MediumSats MediumSat1 Setting r1
+lbn r0 DialsLarge DialSatHoriz Setting Average
+add r0 r0 1
+mul r0 r0 10
+sbn  MediumSats MediumSat1 Horizontal r0
+lbn r0 DialsLarge DialSatVert Setting Average
+mul r0 r0 10
+sbn  MediumSats MediumSat1 Vertical r0
 j ra
 
-danger:
-# turns on suit to protect player & locks helmet
-s Suit AirRelease 1
-s Suit On 1
-s Suit Filtration 1
-s Helmet Open 0
-s Helmet Lock 1
-j start
+HandleAntenna:
+lbn r0 FlipSwitches SwitchSat On Average
+sbn MediumSats MediumSat1 On r0
+j ra
 
-safe:
-# unlocks helmet to allow player to decide if it should be open
-s Helmet Lock 0
-l HelmetOpen Helmet Open # check if helmet open
-brnez HelmetOpen 5 # turn suit on if closed, off if open
-s Suit AirRelease 1
-s Suit On 1
-s Suit Filtration 1
-jr 4
-s Suit AirRelease 0
-s Suit On 0
-s Suit Filtration 0
-j start
+HandleLandingPad:
+move r12 ra
+lbn r0 FlipSwitches SwitchLandingPad On Average
+sbn LandingDatas LD1 On r0
+lbn r0 ButtonsSquare ButtonLandActivate Activate Average
+sbn LandingDatas LD1 Activate r0
+move ra r12
+j ra

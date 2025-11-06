@@ -15,8 +15,10 @@ define caInputNuclear1 HASH("CAInputNuclear1")
 define TransformerBase1 HASH("TransformerBase1")
 define DisplayTransformerBase1 HASH("DisplayTransformerBase1")
 define DisplayTransformerBase2 HASH("DisplayTransformerBase2")
+define DisplayTransformerBase3 HASH("DisplayTransformerBase3")
 define CABase1 HASH("CABase1")
 define CABase2 HASH("CABase2")
+define CABase3 HASH("CABase3")
 
 
 define minPower 3000000
@@ -26,6 +28,7 @@ sbn LargeDisplays consumptionPower Mode 2
 sbn LargeDisplays productionPower Mode 2
 sbn ConsoleDisplays DisplayTransformerBase1 Mode 2
 sbn ConsoleDisplays DisplayTransformerBase2 Mode 2
+sbn ConsoleDisplays DisplayTransformerBase3 Mode 2
 
 main:
 lbn r0 NuclerBatteries nuclearBattery1 PowerActual Average
@@ -36,6 +39,8 @@ lbn r0 CableAnalizers CABase1 PowerActual Average
 sbn ConsoleDisplays DisplayTransformerBase1 Setting r0
 lbn r0 CableAnalizers CABase2 PowerActual Average
 sbn ConsoleDisplays DisplayTransformerBase2 Setting r0
+lbn r0 CableAnalizers CABase3 PowerActual Average
+sbn ConsoleDisplays DisplayTransformerBase3 Setting r0
 
 # alarm
 lbn r0 NuclerBatteries nuclearBattery1 Charge Average

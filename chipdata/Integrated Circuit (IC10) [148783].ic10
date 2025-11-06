@@ -8,8 +8,8 @@ alias SafetyCheck r2 # 1 = safe, 0 = unsafe
 alias HelmetOpen r3 # 1 = open, 0 = closed
 
 # setup safety margins
-define SafeTempMax 302.15 # set in Kelvins, 302.15 K = 29 C
-define SafeTempMin 283.15 # 283.15 K = 10 C
+define SafeTempMax 305.15 # set in Kelvins, 302.15 K = 29 C
+define SafeTempMin 280.15 # 283.15 K = 10 C
 define SafePressureMax 175 # both in kPa
 define SafePressureMin 45
 
