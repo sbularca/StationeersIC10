@@ -1,0 +1,49 @@
+# Timer
+define Displays -815193061
+define DaylightSensors 1076425094
+# add button to set startTimer to 1 reset the time to 0
+
+define DispMinutes HASH("DispMinutes")
+define DispSeconds HASH("DispSeconds")
+define TimeSensor HASH("TimeSensor")
+
+alias minutes r10
+alias seconds r11
+alias startTimer r9
+
+define dayLength 20
+move startTimer 0
+
+loop:
+yield
+jal GetSunAngle
+beqal startTimer 1 AddSeconds
+jal DisplayTime
+j loop
+
+GetSunAngle:
+lbn r0 DaylightSensors TimeSensor Vertical Average
+brne r0 0 2
+move startTimer 1
+j ra
+
+DisplayTime:
+sbn Displays DispMinutes Setting minutes
+sbn Displays DispSeconds Setting seconds
+j ra
+
+AddSeconds:
+push ra
+add seconds seconds 0.5
+beqal seconds 60 AddMinute
+pop ra
+j ra
+
+AddMinute:
+move seconds 0
+add minutes minutes 1
+brlt minutes dayLength 2
+move minutes 0
+j ra
+##! Changes in code does not reflect in link below !!
+##!https://ic10.dev/#eNqNVEuPmzAQ/iuWe2klUtm8DNyivlJpu31k1RMXAt7EFTGpbVaNVvnvHQMmJttDLzy+mfm+eXj8jLe1EidzXx05LjAOcN019usVehBHrkrZ8EchOXov9KmtzhqtMprQPCIpvdqqcyv2B7PlUndKI0pYGocJyeNSvkJV06Bdb0wnkemQ5gZpUykz0FuEIsUtag4cGQAtRkq5UP4iZG+4Rpv1dvO6xB5U4jcLzy2vO9ksPCfI97TiY7bO8YoMfqWsWlFpdJyEFSUO0pOConSGrgWp3Eu9qc53XO7NAYUQfuyeuO86FNl23ako5Vnwtinlr6pFn7jZ9nIt9y0v5Y7/BsgLomjdNK6iwX+ajDUDgCyhJfZogL/dSaTIi0l5ffjJlRE18K2fuKr2VltBCRBEUPgyeWq1VGWVvARASYPSfFj82W25MULuXUv/4elm5zz1XOakdC0dhE69Pgy4PWBuKO5N3iZz8yYoJbZ1YzYQ3Z2GYI96NBWuVsc0CriD4N7U9qc187836onAWcgoAqsl6j/jjjX8SdRc4+IZU/v4pvhjtdtU+oCLFQ2zmEWMsQCPW7miecKyOM1IgH/wR664rPnnBhc0wNu2MwMPsY+vdd2fKmkmJhbHJM/iDPwGi+Bj0PcefIQ5w8/lEuA7OKr3/XHHFS7CKMAflOrgk4CJZpTkLErjF1nOt4DLMo9BKopyepuko4Bkx7kCFgP3ijIW5SmNw/9gh66EYRomSRze8Hs0nkJoBaIwy7MoYeyW/3pBzdnnUZYSlt+2+MoRYLchtjUXN0Qb7gaJ3wlV98KgTddrm8aigf5dBJYwZynLEhLauK5rufoIq6uoDYpYEmUhIRHYxvV84McTWG4FCmz9F+GFx2ybDPLQuDjJljoE30zAv1TBNi2mA4qFc7CopfCqXHbdu1XB4v0UvtvcS702pqoP9pSO/Wx2dll2Q5mXy19G3yV4
