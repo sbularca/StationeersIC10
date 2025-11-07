@@ -1,5 +1,8 @@
 define LightSensors 1076425094
 define GasSensors -1252983604
+define Hydroponics 1441767298
+define DisplaysSmall -815193061
+define DisplaysMedium -53151617
 
 define GrowLights -1758710260
 define WallHeaters 24258244
@@ -8,23 +11,53 @@ define Autolathes 336213101
 define HidraBenders -1888248335
 define ElPrinters 1307165496
 define Stackers 1585641623
+define ToolManuf -465741100
+define Recyclers -1633947337
 
 define lightSensor HASH("LightSensor")
-define temperatureSensor HASH("InteriorGasSensor")
+define solarAngleSensor HASH("SolarAngleSensor")
+define tempSensor HASH("InteriorGasSensor")
 
 define atlStacker HASH("ATLStacker")
 define hpbStacker HASH("HPBStacker")
 define epStacker HASH("EPStacker")
+define toolStacker HASH("ToolStacker")
+define recyclerStacker HASH("RecyclerStacker")
+define Hydros HASH("Hydros")
+define DebugConsole HASH("DebugConsole")
+define DisplayClockMinutes HASH("DisplayClockMinutes")
 
-define minTemp 22
-define maxTemp 28
+define minTemp 27
+define maxTemp 31
+
+alias dayLength r10
+move dayLength 20
+alias angle r2
+alias degreesPerMinute r3
+move degreesPerMinute 0
+alias minutes r4
+div r0 360 dayLength
+move degreesPerMinute r0
+
+sb GrowLights On 0
+sb Hydroponics On 0
 
 main:
+clr db
 yield
 jal loopGrowLights
 jal loopTemperatureControl
 jal StackerControl
+jal Debug
 j main
+
+Debug:
+lbn minutes DisplaysMedium DisplayClockMinutes Setting Average
+sbn DisplaysSmall DebugConsole Setting minutes
+yield
+lbn angle LightSensors solarAngleSensor Vertical Average
+sbn DisplaysSmall DebugConsole Setting angle
+j ra
 
 StackerControl:
 lb r0 Autolathes On Maximum
@@ -33,16 +66,35 @@ lb r0 HidraBenders On Maximum
 sbn Stackers hpbStacker On r0
 lb r0 ElPrinters On Maximum
 sbn Stackers epStacker On r0
+lb r0 ToolManuf On Maximum
+sbn Stackers toolStacker On r0
+lb r0 Recyclers On Maximum
+sbn Stackers recyclerStacker On r0
 j ra
 
 loopGrowLights:
-lbn r0 LightSensors lightSensor Activate Average
-sb GrowLights On r0
+move r12 ra
+lbn minutes DisplaysMedium DisplayClockMinutes Setting Maximum
+beq minutes 3 GrowLightsOn
+beq minutes 9 GrowLightsOff
+bge minutes 12 GrowLightsOn
+bge minutes 20 GrowLightsOff
+move ra r12
+j ra
+
+GrowLightsOn:
+sb GrowLights On 1
+sb Hydroponics On 1
+j ra
+
+GrowLightsOff:
+sb GrowLights On 0
+sb Hydroponics On 0
 j ra
 
 loopTemperatureControl:
 move r12 ra
-lbn r0 GasSensors temperatureSensor Temperature Average
+lbn r0 GasSensors tempSensor Temperature Average
 sub r0 r0 273.15
 bltal r0 minTemp setHeatingOn
 bgtal r0 maxTemp setHeatingOff

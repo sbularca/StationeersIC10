@@ -4,6 +4,9 @@ define MediumSats 439026183
 define LandingDatas -2066405918
 define DispSmall -2041948072
 define ButtonsSquare 1462769197
+define WeatherStations 1997212478
+define LedLights 1944485013
+define DispStandSmall -815193061
 
 define LD1 HASH("LD1")
 define MediumSat1 HASH("MediumSatelliteDish1")
@@ -19,15 +22,35 @@ define DialSatPower HASH("DialSatPower")
 define DialSatHoriz HASH("DialSatHorizontal")
 define DialSatVert HASH("DialSatVertical")
 define ButtonLandActivate HASH("ButtonLandActivate")
+define WS1 HASH("WS1")
+define WSLight HASH("WSLight1")
+define WSDisp HASH("WSDisp")
 
 sbn DispSmall DispSatPower Mode 2
+sbn LedLights WSLight Color 6
 
 main:
 jal HandleAntenna
 jal HandleLandingPad
 jal HandleDials
+jal WeatherCheck
 jal DisplayData
 j main
+
+WeatherCheck:
+sbn WeatherStations WS1 On 1
+sbn LedLights WSLight On 1
+lbn r0 WeatherStations WS1 Mode Average
+add r1 r0 1
+mul r1 r1 2
+jr r1
+j ra
+sbn LedLights WSLight Color 0
+j ra
+sbn LedLights WSLight Color 3
+j ra
+sbn LedLights WSLight Color 4
+j ra
 
 DisplayData:
 lbn r0 MediumSats MediumSat1 RequiredPower Average
@@ -36,6 +59,8 @@ lbn r0 MediumSats MediumSat1 Horizontal Average
 sbn DispSmall DispSatHoriz Setting r0
 lbn r0 MediumSats MediumSat1 Vertical Average
 sbn DispSmall DispSatVert Setting r0
+lbn r0 WeatherStations WS1 NextWeatherEventTime Average
+sbn DispStandSmall WSDisp Setting r0
 
 HandleDials:
 #lbn r0 DialsLarge DialSatPower Setting Average

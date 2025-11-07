@@ -1,7 +1,9 @@
 define LightSensors 1076425094
 define GasSensors -1252983604
 define Hydroponics 1441767298
-define Consoles -815193061
+define DisplaysSmall -815193061
+define IcHousings -128473777
+define WallCoolers -739292323
 
 define GrowLights -1758710260
 define WallHeaters 24258244
@@ -24,17 +26,18 @@ define toolStacker HASH("ToolStacker")
 define recyclerStacker HASH("RecyclerStacker")
 define Hydros HASH("Hydros")
 define DebugConsole HASH("DebugConsole")
+define Timer HASH("Timer")
 
 define minTemp 27
-define maxTemp 31
+define maxTemp 29
+define minCoolTemp 29
 
 alias dayLength r10
 move dayLength 20
 alias angle r2
 alias degreesPerMinute r3
 move degreesPerMinute 0
-alias minutesPassed r4
-move minutesPassed 0
+alias minutes r4
 div r0 360 dayLength
 move degreesPerMinute r0
 
@@ -44,7 +47,6 @@ sb Hydroponics On 0
 main:
 clr db
 yield
-jal CalculateTime
 jal loopGrowLights
 jal loopTemperatureControl
 jal StackerControl
@@ -52,27 +54,10 @@ jal Debug
 j main
 
 Debug:
-sbn Consoles DebugConsole Setting minutesPassed
-yield
+#sbn DisplaysSmall DebugConsole Setting minutes
+#yield
 lbn angle LightSensors solarAngleSensor Vertical Average
-sbn Consoles DebugConsole Setting angle
-j ra
-
-CalculateTime:
-move r12 ra
-lbn angle LightSensors solarAngleSensor Vertical Average
-brgt angle 144 4
-trunc angle angle
-mod r1 angle degreesPerMinute
-beqal r1 0 AddMinute
-brle minutesPassed dayLength 2
-move minutesPassed 0
-move ra r12
-j ra
-
-AddMinute:
-add minutesPassed minutesPassed 1
-sleep 4
+sbn DisplaysSmall DebugConsole Setting angle
 j ra
 
 StackerControl:
@@ -90,13 +75,12 @@ j ra
 
 loopGrowLights:
 move r12 ra
-beq minutesPassed 3 GrowLightsOn
-beq minutesPassed 8 GrowLightsOff
-bge minutesPassed 11 GrowLightsOn
-bge minutesPassed 19 GrowLightsOff
-#lbn r0 LightSensors lightSensor Activate Average
-#sb GrowLights On r0
-#sb Hydroponics On r0
+lbn minutes IcHousings Timer Setting Maximum
+beq minutes 0 GrowLightsOff
+beq minutes 3 GrowLightsOn
+beq minutes 9 GrowLightsOff
+bge minutes 12 GrowLightsOn
+beq minutes 20 GrowLightsOff
 move ra r12
 j ra
 
@@ -115,8 +99,18 @@ move r12 ra
 lbn r0 GasSensors tempSensor Temperature Average
 sub r0 r0 273.15
 bltal r0 minTemp setHeatingOn
-bgtal r0 maxTemp setHeatingOff
+bgeal r0 maxTemp setHeatingOff
+bgtal r0 maxTemp setCoolingOn
+bleal r0 minCoolTemp setCoolingOff
 move ra r12
+j ra
+
+setCoolingOn:
+sb WallCoolers On 1
+j ra
+
+setCoolingOff:
+sb WallCoolers On 0
 j ra
 
 setHeatingOn:

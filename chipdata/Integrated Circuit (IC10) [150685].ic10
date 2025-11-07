@@ -1,66 +1,63 @@
-define FlipSwitches 1773255945
-define DialsLarge 1465300791
-define MediumSats 439026183
-define LandingDatas -2066405918
-define DispSmall -2041948072
-define ButtonsSquare 1462769197
+# Timer
+define DisplaysMedium -53151617
+define DisplaySmall -815193061
+define DaylightSensors 1076425094
+define LogicSwitch 491845673
+# add button to set startTimer to 1 reset the time to 0
 
-define LD1 HASH("LD1")
-define MediumSat1 HASH("MediumSatelliteDish1")
+define DispClockMinutes HASH("DisplayClockMinutes")
+define DispClockSeconds HASH("DisplayClockSeconds")
+define TimeSensor HASH("TimeSensor")
+define ButtonResetClock HASH("ButtonResetClock")
 
-define SwitchSat HASH("SwitchSat")
-define SwitchLandingPad HASH("SwitchLandingPad")
+alias minutes r10
+alias seconds r11
+alias time r9
 
-define DispSatPower HASH("DispSatPower")
-define DispSatHoriz HASH("DispSatHoriz")
-define DispSatVert HASH("DispSatVert")
+define dayLength 20
 
-define DialSatPower HASH("DialSatPower")
-define DialSatHoriz HASH("DialSatHorizontal")
-define DialSatVert HASH("DialSatVertical")
-define ButtonLandActivate HASH("ButtonLandActivate")
+loop:
+yield
+yield
+jal ResetTime
+#jal GetSunAngle
+jal AddSeconds
+jal DisplayTime
+jal WriteToDevice
+j loop
 
-sbn DispSmall DispSatPower Mode 2
-
-main:
-jal HandleAntenna
-jal HandleLandingPad
-jal HandleDials
-jal DisplayData
-j main
-
-DisplayData:
-lbn r0 MediumSats MediumSat1 RequiredPower Average
-sbn DispSmall DispSatPower Setting r0
-lbn r0 MediumSats MediumSat1 Horizontal Average
-sbn DispSmall DispSatHoriz Setting r0
-lbn r0 MediumSats MediumSat1 Vertical Average
-sbn DispSmall DispSatVert Setting r0
-
-HandleDials:
-#lbn r0 DialsLarge DialSatPower Setting Average
-#add r0 r0 1
-#mul r1 r0 500
-#sbn  MediumSats MediumSat1 Setting r1
-lbn r0 DialsLarge DialSatHoriz Setting Average
-add r0 r0 1
-mul r0 r0 10
-sbn  MediumSats MediumSat1 Horizontal r0
-lbn r0 DialsLarge DialSatVert Setting Average
-mul r0 r0 10
-sbn  MediumSats MediumSat1 Vertical r0
+WriteToDevice:
+s db Setting minutes
 j ra
 
-HandleAntenna:
-lbn r0 FlipSwitches SwitchSat On Average
-sbn MediumSats MediumSat1 On r0
+ResetTime:
+lbn r0 LogicSwitch ButtonResetClock Activate Maximum
+breq r0 0 3
+add minutes minutes 1
+move seconds 0
 j ra
 
-HandleLandingPad:
-move r12 ra
-lbn r0 FlipSwitches SwitchLandingPad On Average
-sbn LandingDatas LD1 On r0
-lbn r0 ButtonsSquare ButtonLandActivate Activate Average
-sbn LandingDatas LD1 Activate r0
-move ra r12
+GetSunAngle:
+#lbn r0 DaylightSensors TimeSensor Vertical Average
+#brne r0 0 2
+#move startTimer 1
+j ra
+
+DisplayTime:
+sbn DisplaysMedium DispClockMinutes Setting minutes
+sbn DisplaySmall DispClockSeconds Setting seconds
+j ra
+
+AddSeconds:
+push ra
+add seconds seconds 1
+beqal seconds 60 AddMinute
+pop ra
+j ra
+
+AddMinute:
+move seconds 0
+add minutes minutes 1
+brlt minutes dayLength 2
+move minutes 0
 j ra
